@@ -1,9 +1,8 @@
-interface UserFormData {
-    username: string;
-    name: string;
-    surname: string;
-    email: string;
-    password: string;
+interface BookFormData {
+    title: string;
+    author: string;
+    publication_year: number;
+    genre: string;
 }
 
 class FormValidator {
@@ -18,9 +17,7 @@ class FormValidator {
 
     private initializeValidation(): void {
         this.form.addEventListener('submit', (e) => this.handleSubmit(e));
-        
         const inputs = this.form.querySelectorAll('input');
-   
     }
 
     private validateField(input: HTMLInputElement): boolean {
@@ -28,56 +25,55 @@ class FormValidator {
         const fieldName = input.name;
         
         switch(fieldName) {
-            case 'username':
-                return this.validateUsername(value);
-            case 'name':
-                return this.validateName(value, fieldName);
-            case 'surname':
-                return this.validateName(value, fieldName);
-            case 'email':
-                return this.validateEmail(value);
-            case 'password':
-                return this.validatePassword(value);
+            case 'title':
+                return this.validateTitle(value);
+            case 'author':
+                return this.validateAuthor(value);
+            case 'publication_year':
+                return this.validatePublicationYear(value);
+            case 'genre':
+                return this.validateGenre(value);
             default:
                 return true;
         }
     }
 
-    private validateUsername(value: string): boolean {
-        if (value.length < 5) {
-            this.showError('username', 'El nombre de usuario debe tener al menos 5 caracteres');
-            return false;
-        }
-        this.removeError('username');
-        return true;
-    }
-
-    private validateName(value: string, fieldName: string): boolean {
+    private validateTitle(value: string): boolean {
         if (value.length < 1) {
-            this.showError(fieldName, `El ${fieldName === 'name' ? 'nombre' : 'apellido'} no puede estar vacío`);
+            this.showError('title', 'El título no puede estar vacío');
             return false;
         }
-        this.removeError(fieldName);
+        this.removeError('title');
         return true;
     }
 
-    private validateEmail(value: string): boolean {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(value)) {
-            this.showError('email', 'Email inválido');
+    private validateAuthor(value: string): boolean {
+        if (value.length < 1) {
+            this.showError('author', 'El autor no puede estar vacío');
             return false;
         }
-        this.removeError('email');
+        this.removeError('author');
         return true;
     }
 
-    private validatePassword(value: string): boolean {
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[|@#$%&])[A-Za-z\d|@#$%&]{8,}$/;
-        if (!passwordRegex.test(value)) {
-            this.showError('password',  'La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial (|@#$%&)');
+    private validatePublicationYear(value: string): boolean {
+        const year = parseInt(value);
+        const currentYear = new Date().getFullYear();
+        
+        if (isNaN(year) || year < 1000 || year > currentYear) {
+            this.showError('publication_year', `El año debe estar entre 1000 y ${currentYear}`);
             return false;
         }
-        this.removeError('password');
+        this.removeError('publication_year');
+        return true;
+    }
+
+    private validateGenre(value: string): boolean {
+        if (value.length < 1) {
+            this.showError('genre', 'El género no puede estar vacío');
+            return false;
+        }
+        this.removeError('genre');
         return true;
     }
 
@@ -127,23 +123,20 @@ class FormValidator {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        username: formData.get('username'),
-                        name: formData.get('name'),
-                        surname: formData.get('surname'),
-                        email: formData.get('email'),
-                        password: formData.get('password')
+                        title: formData.get('title'),
+                        author: formData.get('author'),
+                        publication_year: parseInt(formData.get('publication_year') as string),
+                        genre: formData.get('genre')
                     }),
                 });
 
                 if (response.ok) {
-                    window.location.href = 'index.html';
+                    window.location.href = 'booksManagement.html';
                 } else {
                     const errorData = await response.json();
-                    console.error("Error al registrar el usuario:", errorData.message);
-                    this.showError('form', errorData.message || "Error al registrar el usuario");
+                    this.showError('form', errorData.message || "Error al registrar el libro");
                 }
             } catch (error) {
-                console.error("Error al enviar el formulario:", error);
                 this.showError('form', "Error al enviar el formulario");
             }
         }

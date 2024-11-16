@@ -21,52 +21,50 @@ class FormValidator {
         const value = input.value.trim();
         const fieldName = input.name;
         switch (fieldName) {
-            case 'username':
-                return this.validateUsername(value);
-            case 'name':
-                return this.validateName(value, fieldName);
-            case 'surname':
-                return this.validateName(value, fieldName);
-            case 'email':
-                return this.validateEmail(value);
-            case 'password':
-                return this.validatePassword(value);
+            case 'title':
+                return this.validateTitle(value);
+            case 'author':
+                return this.validateAuthor(value);
+            case 'publication_year':
+                return this.validatePublicationYear(value);
+            case 'genre':
+                return this.validateGenre(value);
             default:
                 return true;
         }
     }
-    validateUsername(value) {
-        if (value.length < 5) {
-            this.showError('username', 'El nombre de usuario debe tener al menos 5 caracteres');
-            return false;
-        }
-        this.removeError('username');
-        return true;
-    }
-    validateName(value, fieldName) {
+    validateTitle(value) {
         if (value.length < 1) {
-            this.showError(fieldName, `El ${fieldName === 'name' ? 'nombre' : 'apellido'} no puede estar vacío`);
+            this.showError('title', 'El título no puede estar vacío');
             return false;
         }
-        this.removeError(fieldName);
+        this.removeError('title');
         return true;
     }
-    validateEmail(value) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(value)) {
-            this.showError('email', 'Email inválido');
+    validateAuthor(value) {
+        if (value.length < 1) {
+            this.showError('author', 'El autor no puede estar vacío');
             return false;
         }
-        this.removeError('email');
+        this.removeError('author');
         return true;
     }
-    validatePassword(value) {
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[|@#$%&])[A-Za-z\d|@#$%&]{8,}$/;
-        if (!passwordRegex.test(value)) {
-            this.showError('password', 'La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial (|@#$%&)');
+    validatePublicationYear(value) {
+        const year = parseInt(value);
+        const currentYear = new Date().getFullYear();
+        if (isNaN(year) || year < 1000 || year > currentYear) {
+            this.showError('publication_year', `El año debe estar entre 1000 y ${currentYear}`);
             return false;
         }
-        this.removeError('password');
+        this.removeError('publication_year');
+        return true;
+    }
+    validateGenre(value) {
+        if (value.length < 1) {
+            this.showError('genre', 'El género no puede estar vacío');
+            return false;
+        }
+        this.removeError('genre');
         return true;
     }
     showError(fieldName, message) {
@@ -111,20 +109,19 @@ class FormValidator {
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
-                            username: formData.get('username'),
-                            name: formData.get('name'),
-                            surname: formData.get('surname'),
-                            email: formData.get('email'),
-                            password: formData.get('password')
+                            title: formData.get('title'),
+                            author: formData.get('author'),
+                            publication_year: parseInt(formData.get('publication_year')),
+                            genre: formData.get('genre')
                         }),
                     });
                     if (response.ok) {
-                        window.location.href = 'index.html';
+                        window.location.href = 'booksManagement.html';
                     }
                     else {
                         const errorData = yield response.json();
-                        console.error("Error al registrar el usuario:", errorData.message);
-                        this.showError('form', errorData.message || "Error al registrar el usuario");
+                        console.error("Error al registrar el libro:", errorData.message);
+                        this.showError('form', errorData.message || "Error al registrar el libro");
                     }
                 }
                 catch (error) {

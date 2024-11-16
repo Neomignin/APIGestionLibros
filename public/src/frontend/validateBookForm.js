@@ -9,21 +9,36 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import FormValidator from "../backend/utils/FormValidator.js";
 document.addEventListener("DOMContentLoaded", () => {
-    const validator = new FormValidator("userForm");
-    const form = document.getElementById("userForm");
+    const validator = new FormValidator("bookForm");
+    const form = document.getElementById("bookForm");
     if (form) {
         form.addEventListener("submit", (event) => __awaiter(void 0, void 0, void 0, function* () {
             event.preventDefault();
             const formData = new FormData(form);
+            const bookData = {
+                title: formData.get('title'),
+                author: formData.get('author'),
+                publication_year: parseInt(formData.get('publication_year')),
+                genre: formData.get('genre'),
+                available: true
+            };
             const response = yield fetch(form.action, {
                 method: form.method,
-                body: formData,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(bookData),
             });
             if (response.ok) {
-                window.location.href = 'index.html';
+                window.location.href = 'booksManagement.html';
             }
             else {
-                console.error("Error al registrar el usuario");
+                const errorData = yield response.json();
+                console.error("Error al registrar el libro:", errorData.message);
+                const errorElement = document.getElementById('errorMessage');
+                if (errorElement) {
+                    errorElement.textContent = errorData.message || "Error al registrar el libro";
+                }
             }
         }));
     }

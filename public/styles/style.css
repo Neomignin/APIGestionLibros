@@ -66,14 +66,14 @@ thead {
   color: white;
 }
 
+tbody tr:hover {
+  background-color: #f5f6fa;
+}
+
 th, td {
   padding: 1rem;
   text-align: left;
   border-bottom: 1px solid #ddd;
-}
-
-tr:hover {
-  background-color: #f5f6fa;
 }
 
 .form-container {
@@ -138,6 +138,11 @@ img.update-button:hover, img.delete-button:hover {
   padding: 0.8rem;
   border-radius: var(--border-radius);
   margin-top: 0.5rem;
+  display: none;
+}
+
+.error-message:not(:empty) {
+  display: block;
 }
 
 .success-message {
@@ -146,6 +151,11 @@ img.update-button:hover, img.delete-button:hover {
   padding: 0.8rem;
   border-radius: var(--border-radius);
   margin-top: 0.5rem;
+  display: none;
+}
+
+.success-message:not(:empty) {
+  display: block;
 }
 
 @media (max-width: 768px) {
@@ -243,4 +253,28 @@ footer {
 
 .card {
   animation: fadeIn 0.5s ease-in;
+}
+
+.availability-toggle {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.availability-toggle.available {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.availability-toggle.unavailable {
+    background-color: var(--error-color);
+    color: white;
+}
+
+.availability-toggle:hover {
+    opacity: 0.9;
+    transform: scale(1.05);
 }
